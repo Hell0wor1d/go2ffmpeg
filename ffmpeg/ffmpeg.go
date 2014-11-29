@@ -8,12 +8,12 @@ import (
 	"os/exec"
 )
 
-type ffmpeg struct {
+type Ffmpeg struct {
 	in  io.ReadCloser
 	Cmd *exec.Cmd
 }
 
-func NewFfmpeg(filename string) *ffmpeg {
+func NewFfmpeg(filename string) *Ffmpeg {
 	cmd := exec.Command("ffmpeg", "-i", filename, "-f", "s16le", "-")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -22,14 +22,14 @@ func NewFfmpeg(filename string) *ffmpeg {
 	if err := cmd.Start(); err != nil {
 		log.Fatal(err)
 	}
-	return &ffmpeg{stdout, cmd}
+	return &Ffmpeg{stdout, cmd}
 }
 
-func (f *ffmpeg) Close() error {
+func (f *Ffmpeg) Close() error {
 	return f.in.Close()
 }
 
-func (e *ffmpeg) ProcessAudio(_, out [][]int16) {
+func (e *Ffmpeg) ProcessAudio(out [][]int16) {
 	// int16 takes 2 bytes
 	bufferSize := len(out[0]) * 4
 	var pack = make([]byte, bufferSize)

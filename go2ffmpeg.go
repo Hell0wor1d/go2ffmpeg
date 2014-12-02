@@ -26,7 +26,7 @@ func main() {
 	//	framePerBuffer := 2048
 	args := []string{
 		"-i", inputfile,
-		"-f", "s16le",
+		"-f", "mp3",
 		"-",
 	}
 	ff := ffmpeg.NewFFmpeg(args)
@@ -34,9 +34,13 @@ func main() {
 		log.Fatal("ffmpeg can not be nill.")
 	}
 	//defer ff.Close()
-	buffer := make([]byte, 1024)
-
-	ff.Read(buffer)
+	//buffer := make([]byte, 1024)
+	out, err := os.Create("/Users/kevin/filename.mp3")
+	defer out.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	ff.Read(out)
 	//	portaudio.Initialize()
 	//	defer portaudio.Terminate()
 	//	stream, err := portaudio.OpenDefaultStream(0, 2, 44100, framePerBuffer, ff)

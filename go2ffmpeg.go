@@ -18,12 +18,24 @@ func main() {
 		os.Exit(0)
 	}
 	inputfile := os.Args[1]
-	//	chk := func(err error) {
-	//		if err != nil {
-	//			panic(err)
-	//		}
-	//	}
-	//	framePerBuffer := 2048
+
+	defer func() {
+		if err := recover(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	chk := func(err error) {
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	finfo, err := os.Stat(inputfile)
+	chk(err)
+	if !finfo.Mode().IsRegular() {
+		panic("target is not a file.")
+	}
 	args := []string{
 		"-i", inputfile,
 		"-f", "mp3",
@@ -31,24 +43,10 @@ func main() {
 	}
 	ff := ffmpeg.NewFFmpeg(args)
 	if ff == nil {
-		log.Fatal("ffmpeg can not be nill.")
+		panic("ffmpeg can not be nil.")
 	}
-	//defer ff.Close()
-	//buffer := make([]byte, 1024)
 	out, err := os.Create("/Users/kevin/filename.mp3")
 	defer out.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
+	chk(err)
 	ff.Read(out)
-	//	portaudio.Initialize()
-	//	defer portaudio.Terminate()
-	//	stream, err := portaudio.OpenDefaultStream(0, 2, 44100, framePerBuffer, ff)
-	//chk(err)
-	//defer stream.Close()
-	//chk(stream.Start())
-	//if err := ff.Wait(); err != nil {
-	//		log.Fatal(err)
-	//	}
-	//	chk(stream.Stop())
 }
